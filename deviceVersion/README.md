@@ -8,7 +8,7 @@ Enter "nvcc batchFFT_2.cu CholeskySolver.cu Test.cu Util.cu MatrixTranspose.cu -
 The size of cube: M,N,L (L equals MxN by default)    
 Numer of tests for each run: TESTTIMES (Test the same size cube for multiple times)      
 Number of bins: BIN    
-Fdopp and other   
+Fdopp and other parameters  
 
 All of them can be modified in the "header.cuh" file.
 

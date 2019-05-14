@@ -1,8 +1,8 @@
 # STAP-CUDA version
 
 ## Compile 
-Type "nvcc batchFFT_2.cu CholeskySolver.cu Test.cu Util.cu MatrixTranspose.cu -o STAP -lcublas -lcusolver -lcufft" to compile, 
-this will output a executable file named "STAP"
+Enter "nvcc batchFFT_2.cu CholeskySolver.cu Test.cu Util.cu MatrixTranspose.cu -o STAP -lcublas -lcusolver -lcufft" in command line to compile, and this will output a executable file named "STAP". Enter "./STAP" to execute it.  
+
 
 ## Parameters 
 The size of cube: M,N,L (L equals MxN by default)    

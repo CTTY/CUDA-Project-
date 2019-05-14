@@ -5,10 +5,10 @@ Type "nvcc batchFFT_2.cu CholeskySolver.cu Test.cu Util.cu MatrixTranspose.cu -o
 this will output a executable file named "STAP"
 
 ## Parameters 
-The size of cube: M,N,L (L equals MxN by default) 
-Test times: TESTTIMES 
-Number of bins: BIN 
-Fdopp and other
+The size of cube: M,N,L (L equals MxN by default)    
+Test times: TESTTIMES    
+Number of bins: BIN    
+Fdopp and other   
 
 All of them can be modified in the "header.cuh" file.
 

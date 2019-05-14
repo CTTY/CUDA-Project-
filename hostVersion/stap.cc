@@ -15,8 +15,8 @@
 #include <math.h>
 #include <limits>
 #include <cstring>
-#include <cblas.h>
-#include <lapacke.h>
+#include "cblas.h"
+#include "lapacke.h"
 
 // Compile with
 // g++ -I .. -fopenmp stap.cc ../fftw++.cc -lfftw3 -lfftw3_omp -llapack -lblas

@@ -1,5 +1,6 @@
 // stap code 
 #include "Array.h"
+#include "Complex.h"
 #include "fftw++.h"
 #include <chrono>
 #include <cmath>

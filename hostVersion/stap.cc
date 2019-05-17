@@ -1,6 +1,5 @@
 // stap code 
 #include "Array.h"
-#include "Complex.h"
 #include "fftw++.h"
 #include <chrono>
 #include <cmath>
@@ -15,8 +14,8 @@
 #include <math.h>
 #include <limits>
 #include <cstring>
-#include "cblas.h"
-#include "lapacke.h"
+#include <cblas.h>
+#include <lapacke.h>
 
 // Compile with
 // g++ -I .. -fopenmp stap.cc ../fftw++.cc -lfftw3 -lfftw3_omp -llapack -lblas
@@ -40,6 +39,7 @@ int main()
   int nx=32, ny=32, nz=nx*ny;
   size_t align=sizeof(Complex);
   //arrays and floats
+
   array3<Complex> cube(nx,ny,nz,align);
   array1<Complex> y(nx*ny,align);
   array2<Complex> S(nx*ny,nx*ny,align);
@@ -55,9 +55,10 @@ int main()
   array1<Complex> z(1,align);
   array1<Complex> alpha(1,align);
   array1<Complex> beta(1,align);
+  array1<Complex> alpha1(1,align);
   alpha=Complex(1,0);
-  beta=alpha;
-
+  beta=Complex(1,0);
+  alpha1=Complex(-1,0);
   float Fdopp = random_float(0,100);
   float theta = random_float(0,90);
   float lambda= random_float(0,10);
@@ -66,13 +67,13 @@ int main()
   star=Complex(1,1); //simple vector to conjugate any other vector 
   //generate random cube and F vector for steering angle
   srand(time(NULL));
-  for(unsigned int i=0; i < nx; i++) 
-    for(unsigned int j=0; j < ny; j++) 
-      for(unsigned int k=0; k < nz; k++) 
+  for(size_t i=0; i < nx; i++) 
+    for(size_t j=0; j < ny; j++) 
+      for(size_t k=0; k < nz; k++) 
         cube(i,j,k)=Complex(10*random_float(0.0,1.0),10*random_float(0.0,1.0));
   cout<<"Created the cube"<<endl;
 
-  for(unsigned int i=0;i<nx;i++){
+  for(size_t i=0;i<nx;i++){
     F(i)=Complex(cos(2*PI*i*Fdopp),-sin(2*PI*i*Fdopp));
   }
   //cout << "\ninput:\n" << cube; 
@@ -85,60 +86,54 @@ int main()
   auto start = std::chrono::high_resolution_clock::now();
   //vectorize slice  and get Covariance start
 
-
-  for(unsigned int i=0; i < nz; i++) {
-    for(unsigned int j=0; j < nx; j++) { 
-      for(unsigned int k=0; k < ny; k++) {
-        y(k+ny*j)=cube(j,k,i);
-      }
-    }
+  for(size_t i=0; i < nz; i++) {
+    //y(k+ny*j)=cube(j,k,i);
+    cblas_ccopy(nz,cube,nx,y,1);
     cblas_cdotc_sub(nx*ny,y,1,y,1,s);
-    S+=s;
+    cblas_caxpy(nx,alpha,s,ny,S,ny);
   }
-  S-=s; //done to exclude the product of one 'gate under test'. in our case, we take it to be the last slice.
+  cblas_caxpy(nx,alpha1,s,ny,S,ny); //done to exclude the product of one 'gate under test'. in our case, we take it to be the last slice.
   cout<<"Covariance made"<<endl;    
   //vectorize slice end
   //cout<<"\nCovariance:\n"<< S;
+
+
+
   __complex__ float Smat[nx][ny];
-  for(unsigned int i=0; i < nx; i++){
-    for(unsigned int j=0; j < ny; j++){
-    Smat[i][j]=(real(S(i,j)),imag(S(i,j)));
-    }
-  }
+  cblas_ccopy(nx,S,ny,Smat,ny);
   cout<<"Covariance copied"<<endl;
   //Steering vector start
 
-  for(unsigned int i=0;i<ny;i++){
+  for(size_t i=0;i<ny;i++){
     A=Complex(cos(2*PI*i*sin(angle)),-sin(2*PI*i*sin(angle)));
     cblas_cscal(ny,A,F,1);
-    for(unsigned int j=0;j<nx;j++){
-      t(j+i*nx)=F(j);
-    }
+    cblas_ccopy(nx,F,1,t,ny);
   }
   __complex__ float tstar[nx*ny];
   //Steering vector end
-cout<<"steering vector made"<<endl;
+  cout<<"steering vector made"<<endl;
   //Conjugate steering vector start
   cblas_cscal(nx*ny,star,t,1);
   cblas_ccopy(nx*ny,t,1,tstar,1);
   cblas_ccopy(nx*ny,t,1,ts,1);
   //Conjugate steering vector end
-
+  for (size_t i = 0; i < nz; i++)
+  {
   //Cholesky start
   int info;
   char uplo= 'U';
   int v=min(nx,ny)-1;
   cpbsv_(&uplo,&ny,&v,&ny,*Smat,&nx,tstar,&ny,&info);
   //Cholesky end
-  cout<<"Cholesky done"<<endl;
+  //cout<<"Cholesky done"<<endl;
   cblas_ccopy(ny,tstar,1,u,1);    //u
   cblas_cscal(ny,star,tstar,1);   //u*
   //h=u/(tH x u*)
   cblas_cgemm(CblasRowMajor,CblasTrans,CblasNoTrans,1,1,ny,&alpha,tstar,1,ts,1,&beta,it,1);
   cblas_cscal(ny,it,u,1); 
   cblas_cgemm(CblasRowMajor,CblasTrans,CblasNoTrans,1,1,ny,&alpha,u,1,y,1,&beta,z,1);
+  }
   cout<<"SUCCESS!"<<endl;
-
   // Record end time
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = finish - start;

@@ -71,7 +71,7 @@ int main()
     for(size_t j=0; j < ny; j++) 
       for(size_t k=0; k < nz; k++) 
         cube(i,j,k)=Complex(10*random_float(0.0,1.0),10*random_float(0.0,1.0));
-  cout<<"Created the cube"<<endl;
+//  cout<<"Created the cube"<<endl;
 
   for(size_t i=0;i<nx;i++){
     F(i)=Complex(cos(2*PI*i*Fdopp),-sin(2*PI*i*Fdopp));
@@ -93,7 +93,7 @@ int main()
     cblas_caxpy(nx,alpha,s,ny,S,ny);
   }
   cblas_caxpy(nx,alpha1,s,ny,S,ny); //done to exclude the product of one 'gate under test'. in our case, we take it to be the last slice.
-  cout<<"Covariance made"<<endl;    
+  //cout<<"Covariance made"<<endl;    
   //vectorize slice end
   //cout<<"\nCovariance:\n"<< S;
 
@@ -101,9 +101,10 @@ int main()
 
   __complex__ float Smat[nx][ny];
   cblas_ccopy(nx,S,ny,Smat,ny);
-  cout<<"Covariance copied"<<endl;
+  //cout<<"Covariance copied"<<endl;
   //Steering vector start
-
+  for (size_t var = 0; var < nz; var++) {
+  //looping to simulate test for all bins
   for(size_t i=0;i<ny;i++){
     A=Complex(cos(2*PI*i*sin(angle)),-sin(2*PI*i*sin(angle)));
     cblas_cscal(ny,A,F,1);
@@ -111,14 +112,13 @@ int main()
   }
   __complex__ float tstar[nx*ny];
   //Steering vector end
-  cout<<"steering vector made"<<endl;
+  //cout<<"steering vector made"<<endl;
   //Conjugate steering vector start
   cblas_cscal(nx*ny,star,t,1);
   cblas_ccopy(nx*ny,t,1,tstar,1);
   cblas_ccopy(nx*ny,t,1,ts,1);
   //Conjugate steering vector end
-  for (size_t i = 0; i < nz; i++)
-  {
+  
   //Cholesky start
   int info;
   char uplo= 'U';
@@ -133,7 +133,7 @@ int main()
   cblas_cscal(ny,it,u,1); 
   cblas_cgemm(CblasRowMajor,CblasTrans,CblasNoTrans,1,1,ny,&alpha,u,1,y,1,&beta,z,1);
   }
-  cout<<"SUCCESS!"<<endl;
+  cout<<nx<<' '<<ny<<' '<<nz<<endl;
   // Record end time
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = finish - start;

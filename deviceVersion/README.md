@@ -14,13 +14,13 @@ in command line to execute it.
 
 
 ## Parameters 
-The size of cube: M,N,L (L equals MxN by default)    
-Numer of tests for each run: TESTTIMES (Test the same size cube for multiple times)      
-Number of bins: BIN    
+The size of cube: ```M,N,L //L equals MxN by default```    
+Numer of tests for each run: ```TESTTIMES //Test the same size cube for multiple times```      
+Number of bins: ```BIN```    
 Fdopp and other parameters  
 
-All of them can be modified in the "header.cuh" file.
+All of them can be modified in the ```header.cuh``` file.
 
 ## Output 
 This program will output a text file recording the test data, 
-the format of outputfile is: "M x N x L.txt"
+the format of outputfile is: ```M x N x L.txt```

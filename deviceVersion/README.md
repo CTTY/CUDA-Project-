@@ -1,7 +1,16 @@
 # STAP-CUDA version
 
 ## Compile 
-Enter "nvcc batchFFT_2.cu CholeskySolver.cu Test.cu Util.cu MatrixTranspose.cu -o STAP -lcublas -lcusolver -lcufft" in command line to compile, and this will output a executable file named "STAP". Enter "./STAP" in command line to execute it.  
+Enter 
+```bash
+nvcc batchFFT_2.cu CholeskySolver.cu Test.cu Util.cu MatrixTranspose.cu -o STAP -lcublas -lcusolver -lcufft
+```
+
+in command line to compile, and this will output a executable file named "STAP". Enter 
+```bash
+./STAP
+```
+in command line to execute it.  
 
 
 ## Parameters 

@@ -14,7 +14,7 @@ in command line to execute it.
 
 
 ## Parameters 
-The size of cube: ```M,N,L //L equals MxN by default```    
+The size of cube: ```python M,N,L //L equals MxN by default```    
 Numer of tests for each run: ```TESTTIMES //Test the same size cube for multiple times```      
 Number of bins: ```BIN```    
 Fdopp and other parameters  
